@@ -1,10 +1,26 @@
-{ nixpkgs ? import ../nix {} }:
+{ niv ? import ../niv { } }:
 
-with nixpkgs;
-let 
-  util = domain: name: { ... } @args: callPackage (./. + "/${domain}/${name}.nix") ( args // {} );
-in
-rec {
+with niv;
+
+let
+  util = { domain, name }:
+    { ... }@args:
+    nixpkgs.callPackage (./. + "/${domain}/${name}.nix") (args // { });
+in rec {
   # <hashi-corp>
-  buildHashiCorpPackage = util "hashi-corp" "build-hashi-corp-package";
+  buildHashiCorpPackage = util {
+    domain = "hashi-corp";
+    name = "build-hashi-corp-package";
+  };
+
+  # <file>
+  packageFile = util {
+    domain = "file";
+    name = "package-file";
+  };
+
+  rootFile = util {
+    domain = "file";
+    name = "root-file";
+  };
 }

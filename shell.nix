@@ -1,28 +1,33 @@
-{ nixpkgs ? import ./nix {}
-, talismanpkgs ? import ./packages.nix {} }:
+{ niv ? import ./niv { }, talismanpkgs ? import ./packages.nix { } }:
+
+with niv;
 
 nixpkgs.mkShell rec {
   name = "talismanpkgs";
-  env = nixpkgs.buildEnv { name = name; paths = buildInputs; };
+  env = nixpkgs.buildEnv {
+    name = name;
+    paths = buildInputs;
+  };
   buildInputs = [
     # <talismanpkgs>
     talismanpkgs.bazel
-    talismanpkgs.cargo
+    # talismanpkgs.cargo
     talismanpkgs.consul
-    talismanpkgs.clippy
+    # talismanpkgs.clippy
     talismanpkgs.go
     talismanpkgs.golangci-lint
-    talismanpkgs.google-cloud-sdk
+    # talismanpkgs.google-cloud-sdk
     talismanpkgs.helm
     talismanpkgs.jq
     talismanpkgs.k9s
-    talismanpkgs.mirror
-    talismanpkgs.nodejs
+    # talismanpkgs.mirror
+    # talismanpkgs.nodejs
     talismanpkgs.nomad
-    talismanpkgs.openjdk
+    # talismanpkgs.openjdk
     talismanpkgs.python
-    talismanpkgs.rustc
+    # talismanpkgs.rustc
     talismanpkgs.skaffold
     talismanpkgs.waypoint
   ];
+  shellHook = "unset GOPATH";
 }

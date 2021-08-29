@@ -12,13 +12,13 @@ import os
 
 
 @task()
-def __clean(context):
+def _clean(context):
     context.run(
         "find . -type f -name '.env.*' -o -name '*.env' | xargs rm -f")
 
 
 @task(pre=[_clean])
-def __setup(context, stage="development"):
+def _setup(context, stage="development"):
     context.run(f'python ./scripts/python/setup.py {rootdir} {stage}')
 
     # Instantiate the environment variables in `.env`
@@ -53,16 +53,24 @@ def create(context, name, version):
 # === UPDATE ===
 
 
-@task(pre=[__setup], default=True, name="all")
+@task(pre=[_setup], default=True, name="all")
 def update_all(context):
     """
     Run all `update` tasks
     """
+    update_modules(context)
     update_niv(context)
     update_npm(context)
 
 
-@task(pre=[__setup], name="niv")
+@task(pre=[_setup], name="modules")
+def update_modules(context):
+    """
+    Update git sub-modules
+    """
+    context.run("git submodule update --init --recursive --remote")
+
+@task(pre=[_setup], name="niv")
 def update_niv(context):
     """
     Update niv dependencies
@@ -70,7 +78,7 @@ def update_niv(context):
     context.run("niv update")
 
 
-@task(pre=[__setup], name="npm")
+@task(pre=[_setup], name="npm")
 def update_npm(context):
     """
     Update npm packages
@@ -79,6 +87,7 @@ def update_npm(context):
 
 
 update = Collection("update", update_all)
+update.add_task(update_modules)
 update.add_task(update_niv)
 update.add_task(update_npm)
 

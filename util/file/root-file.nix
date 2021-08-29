@@ -1,0 +1,1 @@
+{ nixpkgsDirectory }: path: nixpkgsDirectory + "/${path}"
